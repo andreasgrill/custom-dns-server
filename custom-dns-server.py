@@ -29,7 +29,6 @@ def dnsfixer(disableFix, config):
 			entries = subprocess.check_output(["grep", "server\\s*=\\s*\\/", profile["dnsmasq-config-path"]])
 		
 		oldIps = re.findall(r"^.*?\/(?:%s)[^0-9]+([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}).*?$" % (re.escape(config["domain"])), entries, re.M)
-		print oldIps
 
 	except RuntimeError as e:
 		print "Error occurred while getting existing dns-server entries."
