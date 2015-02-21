@@ -1,0 +1,18 @@
+{
+	"domain": "example.com",
+	"dns-server-repo": "http://example.com/?oldips=%s&domain=example.com",
+	"mode": "generic",
+	"uci": {
+		"settingspath": "dhcp.@dnsmasq[0].server",
+		"restart-dnsmasq": [
+			["/etc/init.d/dnsmasq","restart"]
+		]
+	},
+	"generic":{
+		"restart-dnsmasq": [
+			["killall","dnsmasq"],
+			["dnsmasq","-c", "1500", "--log-async", "-n"]
+		],
+		"dnsmasq-config-path": "/tmp/etc/dnsmasq.conf"
+	}
+}
