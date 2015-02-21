@@ -13,9 +13,6 @@ def getconfig(path):
 	with open(path, 'r') as f:
 		return json.load(f)
 
-def regescape(s):
-	return re.escape(s)
-
 def dnsfixer(disableFix, config):
 
 	profileName = config['used-profile']
@@ -31,7 +28,7 @@ def dnsfixer(disableFix, config):
 		else:
 			entries = subprocess.check_output(["grep", "server\\s*=\\s*\\/", profile["dnsmasq-config-path"]])
 		
-		oldIps = re.findall(r"^.*?\/(?:%s)[^0-9]+([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}).*?$" % (regescape(config["domain"])), entries, re.M)
+		oldIps = re.findall(r"^.*?\/(?:%s)[^0-9]+([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}).*?$" % (re.escape(config["domain"])), entries, re.M)
 		print oldIps
 
 	except RuntimeError as e:
@@ -51,7 +48,7 @@ def dnsfixer(disableFix, config):
 			if uci:
 				subprocess.call(["uci", "del-list", '%s="/%s/%s"' % (profile["settingspath"], config["domain"], ip)])
 			else:
-				subprocess.call(["sed", "-i", "/server=\\/%s\\/%s/d" % (regescape(config["domain"]), regescape(ip)), profile["dnsmasq-config-path"]])
+				subprocess.call(["sed", "-i", "/server=\\/%s\\/%s/d" % (re.escape(config["domain"]), re.escape(ip)), profile["dnsmasq-config-path"]])
 
 		# add new entries
 		if not disableFix:
