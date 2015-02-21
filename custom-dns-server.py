@@ -18,16 +18,18 @@ def regescape(s):
 
 def dnsfixer(disableFix, config):
 
-	uci = config['mode'] == 'uci'
-	configMode = config[config['mode']]
+	profileName = config['used-profile']
+	profile = config['profiles'][profileName]
+	uci = profile['mode'] == 'uci'
+
 	oldIps = []
 
 	# get the existing dns entries
 	try:
 		if uci:
-			entries = subprocess.check_output(["uci", "get", configMode["settingspath"]]).strip().replace(" ","\n")
+			entries = subprocess.check_output(["uci", "get", profile["settingspath"]]).strip().replace(" ","\n")
 		else:
-			entries = subprocess.check_output(["grep", "server\\s*=\\s*\\/", configMode["dnsmasq-config-path"]])
+			entries = subprocess.check_output(["grep", "server\\s*=\\s*\\/", profile["dnsmasq-config-path"]])
 		
 		oldIps = re.findall(r"^.*?\/(?:%s)[^0-9]+([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}).*?$" % (regescape(config["domain"])), entries, re.M)
 		print oldIps
@@ -47,9 +49,9 @@ def dnsfixer(disableFix, config):
 		# remove old nf entries
 		for ip in oldIps:
 			if uci:
-				subprocess.call(["uci", "del-list", '%s="/%s/%s"' % (configMode["settingspath"], config["domain"], ip)])
+				subprocess.call(["uci", "del-list", '%s="/%s/%s"' % (profile["settingspath"], config["domain"], ip)])
 			else:
-				subprocess.call(["sed", "-i", "/server=\\/%s\\/%s/d" % (regescape(config["domain"]), regescape(ip)), configMode["dnsmasq-config-path"]])
+				subprocess.call(["sed", "-i", "/server=\\/%s\\/%s/d" % (regescape(config["domain"]), regescape(ip)), profile["dnsmasq-config-path"]])
 
 		# add new entries
 		if not disableFix:
@@ -59,14 +61,14 @@ def dnsfixer(disableFix, config):
 					continue
 					
 				if uci:
-					subprocess.call(["uci", "add_list", "%s=/%s/%s" % (configMode["settingspath"], config["domain"], ip)])
+					subprocess.call(["uci", "add_list", "%s=/%s/%s" % (profile["settingspath"], config["domain"], ip)])
 				else:
-					with open(configMode["dnsmasq-config-path"], "a") as myfile:
+					with open(profile["dnsmasq-config-path"], "a") as myfile:
 						myfile.write("server=/%s/%s\n" % (config["domain"], ip))
 
 
 		# restart dnsmasqd
-		for cmd in configMode["restart-dnsmasq"]:
+		for cmd in profile["restart-dnsmasq"]:
 			subprocess.call(cmd)
 
 dnsfixer(os.path.exists("disabled"), getconfig('config.json'))
