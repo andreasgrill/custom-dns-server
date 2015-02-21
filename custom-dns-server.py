@@ -13,7 +13,7 @@ def getconfig(path):
 	with open(path, 'r') as f:
 		return json.load(f)
 
-def dnsfixer(disableFix, config):
+def customdns(disabled, config):
 
 	profileName = config['used-profile']
 	profile = config['profiles'][profileName]
@@ -34,14 +34,14 @@ def dnsfixer(disableFix, config):
 		print "Error occurred while getting existing dns-server entries."
 		print e
 
-	if not disableFix:
+	if not disabled:
 		# load the new entries from the server repo
 		response = urllib2.urlopen(config["dns-server-repo"] % (",".join(oldIps)))
 		html = response.read()
 	else:
 		html = ""
 
-	if len(html) > 0 or (disableFix and len(dnsentries) > 0):
+	if len(html) > 0 or (disabled and len(dnsentries) > 0):
 		# remove old nf entries
 		for ip in oldIps:
 			if uci:
@@ -50,7 +50,7 @@ def dnsfixer(disableFix, config):
 				subprocess.call(["sed", "-i", "/server=\\/%s\\/%s/d" % (re.escape(config["domain"]), re.escape(ip)), profile["dnsmasq-config-path"]])
 
 		# add new entries
-		if not disableFix:
+		if not disabled:
 			for ip in html.split(","):
 				ip = ip.strip()
 				if not re.match('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$', ip):
@@ -67,4 +67,4 @@ def dnsfixer(disableFix, config):
 		for cmd in profile["restart-dnsmasq"]:
 			subprocess.call(cmd)
 
-dnsfixer(os.path.exists("disabled"), getconfig('config.json'))
+customdns(os.path.exists("disabled"), getconfig('config.json'))
