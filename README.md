@@ -8,7 +8,7 @@ Updates dnsmasq config to forward specific domain queries to custom DNS servers.
  
  
 ## How it works
-Updates dnsmasq configuration either with [UCI][uci] or directly, to forward specific DNS queries to DNS server specified by a [webservice](#Webservice).
+Updates dnsmasq configuration either with [UCI][uci] or directly, to forward specific DNS queries to DNS server specified by a [webservice](#webservice).
 Profiles can be specified in [config.json](../blob/master/config.json) for server-specific configurations and commands.
 
 
