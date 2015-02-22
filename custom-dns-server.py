@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 # Custom DNS Server
-# version 0.9.1
+# version 0.9.2
 
 import subprocess
 import urllib2

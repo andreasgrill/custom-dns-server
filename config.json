@@ -7,11 +7,12 @@
 			"mode": "uci",
 			"settingspath": "dhcp.@dnsmasq[0].server",
 			"restart-dnsmasq": [
+				["uci", "commit"],
 				["/etc/init.d/dnsmasq","restart"]
 			]
 		},
 		"generic":{
-			"mode": "generic",
+			"mode": "direct",
 			"restart-dnsmasq": [
 				["killall","dnsmasq"],
 				["dnsmasq","-c", "1500", "--log-async", "-n"]
