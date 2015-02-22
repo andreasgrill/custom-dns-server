@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 # Custom DNS Server
-# version 0.9.2
+# version 0.9.3
 
 import subprocess
 import urllib2
@@ -45,7 +45,7 @@ def customdns(disabled, config):
 		# remove old nf entries
 		for ip in oldIps:
 			if uci:
-				subprocess.call(["uci", "del-list", '%s="/%s/%s"' % (profile["settingspath"], config["domain"], ip)])
+				subprocess.call(["uci", "del_list", "%s=\"/%s/%s\"" % (profile["settingspath"], config["domain"], ip)])
 			else:
 				subprocess.call(["sed", "-i", "/server=\\/%s\\/%s/d" % (re.escape(config["domain"]), re.escape(ip)), profile["dnsmasq-config-path"]])
 
@@ -57,7 +57,7 @@ def customdns(disabled, config):
 					continue
 					
 				if uci:
-					subprocess.call(["uci", "add_list", "%s=/%s/%s" % (profile["settingspath"], config["domain"], ip)])
+					subprocess.call(["uci", "add_list", "%s=\"/%s/%s\"" % (profile["settingspath"], config["domain"], ip)])
 				else:
 					with open(profile["dnsmasq-config-path"], "a") as myfile:
 						myfile.write("server=/%s/%s\n" % (config["domain"], ip))
