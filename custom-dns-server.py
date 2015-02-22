@@ -13,13 +13,14 @@ def getconfig(path):
 	with open(path, 'r') as f:
 		return json.load(f)
 
+def getrelpath(path):
+	return "%s/%s" % (os.path.dirname(os.path.abspath(__file__)), path)
+
 def customdns(disabled, config):
 
 	profileName = config['used-profile']
 	profile = config['profiles'][profileName]
 	uci = profile['mode'] == 'uci'
-
-	oldIps = []
 
 	# get the existing dns entries
 	try:
@@ -30,9 +31,8 @@ def customdns(disabled, config):
 		
 		oldIps = re.findall(r"^.*?\/(?:%s)[^0-9]+([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}).*?$" % (re.escape(config["domain"])), entries, re.M)
 
-	except RuntimeError as e:
-		print "Error occurred while getting existing dns-server entries."
-		print e
+	except:
+		oldIps = []
 
 	if not disabled:
 		# load the new entries from the server repo
@@ -41,7 +41,7 @@ def customdns(disabled, config):
 	else:
 		html = ""
 
-	if len(html) > 0 or (disabled and len(dnsentries) > 0):
+	if len(html) > 0 or (disabled and len(oldIps) > 0):
 		# remove old nf entries
 		for ip in oldIps:
 			if uci:
@@ -67,4 +67,4 @@ def customdns(disabled, config):
 		for cmd in profile["restart-dnsmasq"]:
 			subprocess.call(cmd)
 
-customdns(os.path.exists("disabled"), getconfig('config.json'))
+customdns(os.path.exists(getrelpath("disabled")), getconfig(getrelpath("config.json")))
