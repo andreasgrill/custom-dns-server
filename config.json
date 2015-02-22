@@ -1,6 +1,6 @@
 {
 	"domain": "example.com",
-	"dns-server-repo": "http://example.com/?oldips=%s&domain=example.com",
+	"dns-server-repo": "http://example-dns-server-repo.com/?oldips=%s&domain=example.com",
 	"used-profile": "generic",
 	"profiles": {
 		"uci": {
