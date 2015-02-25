@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 # Custom DNS Server
-# version 0.9.4
+# version 0.9.5
 
 import subprocess
 import urllib2
@@ -36,7 +36,7 @@ def customdns(disabled, config):
 
 	if not disabled:
 		# load the new entries from the server repo
-		response = urllib2.urlopen(config["dns-server-repo"] % (",".join(oldIps)))
+		response = urllib2.urlopen(config["dns-server-repo"].format(oldIps=",".join(oldIps), domain=config["domain"]))
 		html = response.read()
 	else:
 		html = ""
