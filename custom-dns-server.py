@@ -65,8 +65,6 @@ def customdns(disabled, config):
 
 		# restart dnsmasqd
 		for cmd in profile["restart-dnsmasq"]:
-			if cmd[0] is "dnsmasq":
-				cmd.append("--conf-file=" + profile["dnsmasq-config-path"])
-			subprocess.call(cmd)
+			subprocess.call(list(map(lambda x: x.format(config=profile["dnsmasq-config-path"]), cmd)))
 
 customdns(os.path.exists(getrelpath("disabled")), getconfig(getrelpath("config.json")))
