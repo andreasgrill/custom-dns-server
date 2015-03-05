@@ -1,6 +1,6 @@
 {
-	"domain": "netflix.com",
-	"dns-server-repo": "http://netflix.parrot-bytes.com/?oldips={oldIps}&domain={domain}",
+	"domain": "example.com",
+	"dns-server-repo": "http://example-dns-server-repo.com/?oldips={oldIps}&domain={domain}",
 	"used-profile": "generic",
 	"profiles": {
 		"uci": {
@@ -17,7 +17,7 @@
 				["killall","dnsmasq"],
 				["dnsmasq","-c", "1500", "--log-async", "-n"]
 			],
-			"dnsmasq-config-path": "/tmp/dnsmasq.conf"
+			"dnsmasq-config-path": "/tmp/etc/dnsmasq.conf"
 		}
 	}
 }
