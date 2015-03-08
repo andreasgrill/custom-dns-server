@@ -13,11 +13,11 @@
 		},
 		"generic":{
 			"mode": "direct",
+			"dnsmasq-config-path": "/tmp/etc/dnsmasq.conf",
 			"restart-dnsmasq": [
 				["killall","dnsmasq"],
-				["dnsmasq","-c", "1500", "--log-async", "-n"]
-			],
-			"dnsmasq-config-path": "/tmp/etc/dnsmasq.conf"
+				["dnsmasq","-c", "1500", "--log-async", "-n", "--conf-file={config}"]
+			]
 		}
 	}
 }
