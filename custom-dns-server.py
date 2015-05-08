@@ -25,7 +25,7 @@ def customdns(disabled, config):
 	# get the existing dns entries
 	try:
 		if uci:
-			entries = subprocess.check_output(["uci", "get", profile["settingspath"]]).strip().replace(" ","\n")
+			entries = subprocess.check_output(["uci", "get", profile["dnsmasq-config-path"]]).strip().replace(" ","\n")
 		else:
 			entries = subprocess.check_output(["grep", "server\\s*=\\s*\\/", profile["dnsmasq-config-path"]])
 		
@@ -45,7 +45,7 @@ def customdns(disabled, config):
 		# remove old nf entries
 		for ip in oldIps:
 			if uci:
-				subprocess.call("uci del_list %s=\"/%s/%s\"" % (profile["settingspath"], config["domain"], ip), shell=True)
+				subprocess.call("uci del_list %s=\"/%s/%s\"" % (profile["dnsmasq-config-path"], config["domain"], ip), shell=True)
 			else:
 				subprocess.call(["sed", "-i", "/server=\\/%s\\/%s/d" % (re.escape(config["domain"]), re.escape(ip)), profile["dnsmasq-config-path"]])
 
@@ -57,14 +57,14 @@ def customdns(disabled, config):
 					continue
 					
 				if uci:
-					subprocess.call("uci add_list %s=\"/%s/%s\"" % (profile["settingspath"], config["domain"], ip), shell=True)
+					subprocess.call("uci add_list {path}=\"/{domain}/{ip}\"".format(path=profile["dnsmasq-config-path"], domain=config["domain"], ip=ip), shell=True)
 				else:
 					with open(profile["dnsmasq-config-path"], "a") as myfile:
-						myfile.write("server=/%s/%s\n" % (config["domain"], ip))
+						myfile.write("server=/{domain}/{ip}\n".format(domain=config["domain"], ip=ip))
 
 
 		# restart dnsmasqd
 		for cmd in profile["restart-dnsmasq"]:
-			subprocess.call(list(map(lambda x: x.format(config=profile["dnsmasq-config-path"]), cmd)))
+			subprocess.call(map(lambda x: x.format(config=profile["dnsmasq-config-path"]), cmd))
 
 customdns(os.path.exists(getrelpath("disabled")), getconfig(getrelpath("config.json")))

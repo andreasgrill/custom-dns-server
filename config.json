@@ -5,7 +5,7 @@
 	"profiles": {
 		"uci": {
 			"mode": "uci",
-			"settingspath": "dhcp.@dnsmasq[0].server",
+			"dnsmasq-config-path": "dhcp.@dnsmasq[0].server",
 			"restart-dnsmasq": [
 				["uci", "commit"],
 				["/etc/init.d/dnsmasq","restart"]
