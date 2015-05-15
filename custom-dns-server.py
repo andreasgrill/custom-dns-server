@@ -77,22 +77,23 @@ def customdns(disabled, config):
 if __name__ == "__main__":
 	parser = OptionParser()                                                                                                                 
                                                                                                                                                
-	parser.add_option("-s" , "--stop", action="store_true",                                                                                   
-                      dest="stop", default=False,                                                                                              
-                      help="Stop the service, run with default dns settings")
+	parser.add_option("-d" , "--disable", action="store_true",                                                                                   
+                      dest="disable", default=False,                                                                                              
+                      help="Disable the service, run with default dns settings")
 	parser.add_option("-e" , "--enable", action="store_true",                                                                                   
                       dest="enable", default=False,                                                                                              
                       help="(Re)enable the service, run with custom dns settings")
 	(opts,args) = parser.parse_args()
 
-	if opts.stop and opts.enable:
-		print("Stop and Enable can't both be specified at the same time.")
+	if opts.disable and opts.enable:
+		print("Disable and enable can't both be specified at the same time.")
 		sys.exit(2)
 
-	if opts.stop:
+	if opts.disable:
 		open(getrelpath("disabled"), 'a').close()
 
 	if opts.enable:
 		os.remove(getrelpath("disabled"))
 
-	customdns(opts.stop or os.path.exists(getrelpath("disabled")), getconfig(getrelpath("config.json")))
+	customdns(opts.disable or os.path.exists(getrelpath("disabled")), getconfig("/opt/custom-dns-server/config.json"))
+
