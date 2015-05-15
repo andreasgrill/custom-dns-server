@@ -1,4 +1,4 @@
-#!/opt/bin/python
+#!/usr/bin/env python
 
 # Custom DNS Server
 # version 0.9.5
@@ -81,4 +81,4 @@ if __name__ == "__main__":
                       help="Stop the service, run with default dns settings")                                                                  
                                                                                                                                                
 	(opts,args) = parser.parse_args()
-	customdns(opts.stop or os.path.exists(getrelpath("disabled")), getconfig("/opt/custom-dns-server/config.json"))
+	customdns(opts.stop or os.path.exists(getrelpath("disabled")), getconfig(getrelpath("config.json")))
