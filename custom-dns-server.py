@@ -1,13 +1,14 @@
-#!/opt/bin/python
+#!/usr/bin/env python
 
 # Custom DNS Server
-# version 0.9.5
+# version 0.9.6
 
 import subprocess
 import urllib2
 import os.path
 import re
 import json
+import sys
 from optparse import OptionParser
 
 
@@ -31,7 +32,7 @@ def customdns(disabled, config):
 	# get the existing dns entries
 	try:
 		if uci:
-			entries = subprocess.check_output(["uci", "get", profile["settingspath"]]).strip().replace(" ","\n")
+			entries = subprocess.check_output(["uci", "get", profile["dnsmasq-config-path"]]).strip().replace(" ","\n")
 		else:
 			entries = subprocess.check_output(["grep", "server\\s*=\\s*\\/", profile["dnsmasq-config-path"]])
 		
@@ -51,7 +52,7 @@ def customdns(disabled, config):
 		# remove old nf entries
 		for ip in oldIps:
 			if uci:
-				subprocess.call("uci del_list %s=\"/%s/%s\"" % (profile["settingspath"], config["domain"], ip), shell=True)
+				subprocess.call("uci del_list %s=\"/%s/%s\"" % (profile["dnsmasq-config-path"], config["domain"], ip), shell=True)
 			else:
 				subprocess.call(["sed", "-i", "/server=\\/%s\\/%s/d" % (re.escape(config["domain"]), re.escape(ip)), profile["dnsmasq-config-path"]])
 
@@ -63,22 +64,35 @@ def customdns(disabled, config):
 					continue
 					
 				if uci:
-					subprocess.call("uci add_list %s=\"/%s/%s\"" % (profile["settingspath"], config["domain"], ip), shell=True)
+					subprocess.call("uci add_list {path}=\"/{domain}/{ip}\"".format(path=profile["dnsmasq-config-path"], domain=config["domain"], ip=ip), shell=True)
 				else:
 					with open(profile["dnsmasq-config-path"], "a") as myfile:
-						myfile.write("server=/%s/%s\n" % (config["domain"], ip))
+						myfile.write("server=/{domain}/{ip}\n".format(domain=config["domain"], ip=ip))
 
 
 		# restart dnsmasqd
 		for cmd in profile["restart-dnsmasq"]:
-			subprocess.call(list(map(lambda x: x.format(config=profile["dnsmasq-config-path"]), cmd)))
+			subprocess.call(map(lambda x: x.format(config=profile["dnsmasq-config-path"]), cmd))
 
 if __name__ == "__main__":
 	parser = OptionParser()                                                                                                                 
                                                                                                                                                
 	parser.add_option("-s" , "--stop", action="store_true",                                                                                   
                       dest="stop", default=False,                                                                                              
-                      help="Stop the service, run with default dns settings")                                                                  
-                                                                                                                                               
+                      help="Stop the service, run with default dns settings")
+	parser.add_option("-e" , "--enable", action="store_true",                                                                                   
+                      dest="enable", default=False,                                                                                              
+                      help="(Re)enable the service, run with custom dns settings")
 	(opts,args) = parser.parse_args()
-	customdns(opts.stop or os.path.exists(getrelpath("disabled")), getconfig("/opt/custom-dns-server/config.json"))
+
+	if opts.stop and opts.enable:
+		print("Stop and Enable can't both be specified at the same time.")
+		sys.exit(2)
+
+	if opts.stop:
+		open(getrelpath("disabled"), 'a').close()
+
+	if opts.enable:
+		os.remove(getrelpath("disabled"))
+
+	customdns(opts.stop or os.path.exists(getrelpath("disabled")), getconfig(getrelpath("config.json")))
