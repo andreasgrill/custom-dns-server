@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
 # Custom DNS Server
-# version 0.9.5
+# version 0.9.6
 
 import subprocess
 import urllib2
 import os.path
 import re
 import json
+import sys
 from optparse import OptionParser
 
 
@@ -78,7 +79,20 @@ if __name__ == "__main__":
                                                                                                                                                
 	parser.add_option("-s" , "--stop", action="store_true",                                                                                   
                       dest="stop", default=False,                                                                                              
-                      help="Stop the service, run with default dns settings")                                                                  
-                                                                                                                                               
+                      help="Stop the service, run with default dns settings")
+	parser.add_option("-e" , "--enable", action="store_true",                                                                                   
+                      dest="enable", default=False,                                                                                              
+                      help="(Re)enable the service, run with custom dns settings")
 	(opts,args) = parser.parse_args()
+
+	if opts.stop and opts.enable:
+		print("Stop and Enable can't both be specified at the same time.")
+		sys.exit(2)
+
+	if opts.stop:
+		open(getrelpath("disabled"), 'a').close()
+
+	if opts.enable:
+		os.remove(getrelpath("disabled"))
+
 	customdns(opts.stop or os.path.exists(getrelpath("disabled")), getconfig(getrelpath("config.json")))
