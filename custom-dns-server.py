@@ -95,5 +95,5 @@ if __name__ == "__main__":
 	if opts.enable:
 		os.remove(getrelpath("disabled"))
 
-	customdns(opts.disable or os.path.exists(getrelpath("disabled")), getconfig("/opt/custom-dns-server/config.json"))
+	customdns(opts.disable or os.path.exists(getrelpath("disabled")), getconfig(getrelpath("config.json")))
 
