@@ -17,7 +17,8 @@ def getconfig(path):
 		return json.load(f)
 
 def getrelpath(path):
-	return "%s/%s" % (os.path.dirname(os.path.abspath(__file__)), path)
+	return "%s/%s" % (os.path.dirname(os.path.realpath(os.path.abspath(__file__))), path)
+
 
 def customdns(disabled, config):
 	if disabled:
@@ -95,5 +96,5 @@ if __name__ == "__main__":
 	if opts.enable:
 		os.remove(getrelpath("disabled"))
 
-	customdns(opts.disable or os.path.exists(getrelpath("disabled")), getconfig("/opt/custom-dns-server/config.json"))
+	customdns(opts.disable or os.path.exists(getrelpath("disabled")), getconfig(getrelpath("config.json")))
 
