@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/opt/bin/python
 
 # Custom DNS Server
 # version 0.9.5
@@ -8,6 +8,8 @@ import urllib2
 import os.path
 import re
 import json
+from optparse import OptionParser
+
 
 def getconfig(path):
 	with open(path, 'r') as f:
@@ -17,6 +19,10 @@ def getrelpath(path):
 	return "%s/%s" % (os.path.dirname(os.path.abspath(__file__)), path)
 
 def customdns(disabled, config):
+	if disabled:
+		print("Disabling service")
+	else:
+		print("Enabling service")
 
 	profileName = config['used-profile']
 	profile = config['profiles'][profileName]
@@ -67,4 +73,12 @@ def customdns(disabled, config):
 		for cmd in profile["restart-dnsmasq"]:
 			subprocess.call(map(lambda x: x.format(config=profile["dnsmasq-config-path"]), cmd))
 
-customdns(os.path.exists(getrelpath("disabled")), getconfig(getrelpath("config.json")))
+if __name__ == "__main__":
+	parser = OptionParser()                                                                                                                 
+                                                                                                                                               
+	parser.add_option("-s" , "--stop", action="store_true",                                                                                   
+                      dest="stop", default=False,                                                                                              
+                      help="Stop the service, run with default dns settings")                                                                  
+                                                                                                                                               
+	(opts,args) = parser.parse_args()
+	customdns(opts.stop or os.path.exists(getrelpath("disabled")), getconfig("/opt/custom-dns-server/config.json"))
