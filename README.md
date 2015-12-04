@@ -13,7 +13,11 @@ Profiles can be specified in [config.json](config.json) for server-specific conf
 
 
 ## Webservice
-A webservice is required that might take existing DNS server IPs as GET parameters and should return IP addresses separated by comma, or nothing if no change is required. The webservice and its exact URI can be specified in the `dns-server-repo` entry in [config.json](config.json).
+A webservice is required that might take existing DNS server IPs as GET parameters and should return IP addresses separated by comma, or nothing if no change is required. The webservice and its exact URI can be specified in the `dns-server-repo` entry in the config.json file.
+
+
+## Configuration
+The [default.config.json](default.config.json) file contains an example configuration. Create a copy of [default.config.json](default.config.json) and name the new copy `config.json`. The entries `domain`, `dns-server-repo` and `used-profile` must be adapted.
 
 
 [uci]:http://nbd.name/gitweb.cgi?p=uci.git;a=summary
